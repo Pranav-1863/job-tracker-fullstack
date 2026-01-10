@@ -138,7 +138,7 @@
         const data = await response.json();
 
         if (response.ok) {
-          window.location.href = '/';
+          window.location.href = 'index.html';
         } else {
           errorDiv.textContent = data.error || 'Login failed';
         }
