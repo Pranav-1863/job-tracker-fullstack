@@ -18,7 +18,11 @@ app.use(session({
   secret: 'your-secret-key-change-this-later',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false }
+  cookie: {
+    secure: false,
+    sameSite: 'none',
+    httpOnly: true
+  }
 }));
 
 function requireAuth(req, res, next) {
