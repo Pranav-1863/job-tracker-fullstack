@@ -3,8 +3,13 @@ const pool = require('./db');
 const path = require('path');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
-const { error } = require('console');
+const cors = require('cors');
 const app = express();
+
+app.use(cors({
+  origin: 'https://job-tracker-frontend-9hkl.onrender.com',
+  credentials: true
+}));
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../frontend')));
