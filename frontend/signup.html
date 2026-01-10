@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sign Up - Job Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .auth-container {
+        background: white;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        max-width: 400px;
+        width: 100%;
+      }
+
+      h1 {
+        color: #667eea;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+        color: #333;
+        font-weight: 600;
+      }
+
+      input {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1em;
+      }
+
+      input:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      button {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1em;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      }
+
+      .error {
+        color: #f44336;
+        margin-top: 10px;
+        text-align: center;
+      }
+
+      .success {
+        color: #4caf50;
+        margin-top: 10px;
+        text-align: center;
+      }
+
+      .switch-link {
+        text-align: center;
+        margin-top: 20px;
+        color: #666;
+      }
+
+      .switch-link a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="auth-container">
+      <h1>📝 Sign Up</h1>
+      <form id="signupForm">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="username" required>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="email" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="password" required minlength="6">
+        </div>
+        <button type="submit">Sign Up</button>
+        <div class="error" id="error"></div>
+        <div class="success" id="success"></div>
+      </form>
+      <div class="switch-link">
+        Already have an account? <a href="login.html">Login</a>
+      </div>
+    </div>
+
+    <script>
+      const form = document.getElementById('signupForm');
+      const errorDiv = document.getElementById('error');
+      const successDiv = document.getElementById('success');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errorDiv.textContent = '';
+        successDiv.textContent = '';
+
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        try {
+          const response = await fetch('/api/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, email, password })
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            successDiv.textContent = 'Account created! Redirecting to login...';
+            setTimeout(() => {
+              window.location.href = 'login.html';
+            }, 2000);
+          } else {
+            errorDiv.textContent = data.error || 'Signup failed';
+          }
+        } catch (err) {
+          errorDiv.textContent = 'Network error';
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Job Application Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <script>
+      (async function() {
+        try {
+          const response = await fetch('/api/check-auth');
+          const data = await response.json();
+
+          if (!data.authenticated) {
+            window.location.href = 'login.html';
+          }
+        } catch (err) {
+          window.location.href = 'login.html';
+        }
+      })();
+    </script>
+
+    <div class="main-container">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h1>Job Application Tracker</h1>
+        <button onclick="logout()" style="padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 8px; cursor: pointer;">
+          Logout
+        </button>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="stats" id="stats"></div>
+
+      <div class="search-container">
+        <input type="text" id="searchInput" placeholder="🔍 Search by company or position...">
+      </div>
+
+      <div class="form-container">
+        <form id="jobForm">
+          <div class="form-grid">
+            <input type="text" id="company" placeholder="Company Name" required>
+            <input type="text" id="position" placeholder="Position" required>
+            <input type="date" id="date" required>
+            <select id="status">
+              <option value="Applied">Applied</option>
+              <option value="Interview Scheduled">Interview Scheduled</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Offer">Offer</option>
+            </select>
+          </div>
+          <div class="button-group">
+            <button type="submit" class="btn-primary" id="submitBtn">Add Application</button>
+            <button type="button" class="btn-secondary" id="cancelBtn" style="display: none;">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <br><hr><br>
+
+      <div id="applicationsList"></div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
