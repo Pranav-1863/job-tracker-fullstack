@@ -11,7 +11,9 @@ loadApplications();
 
 async function loadApplications() {
   try {
-    const response = await fetch('https://job-tracker-backend-4t5v.onrender.com/api/applications');
+    const response = await fetch('https://job-tracker-backend-4t5v.onrender.com/api/applications', {
+      credentials: 'include'
+    });
     const data = await response.json();
     applications = data;
     displayApplications();
@@ -42,7 +44,8 @@ form.addEventListener('submit', async function(e) {
       const response = await fetch(`https://job-tracker-backend-4t5v.onrender.com/api/applications/${app.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(application)
+        body: JSON.stringify(application),
+        credentials: 'include'
       });
       const updatedApp = await response.json();
       applications[editingIndex] = updatedApp;
@@ -57,7 +60,8 @@ form.addEventListener('submit', async function(e) {
       const response = await fetch('https://job-tracker-backend-4t5v.onrender.com/api/applications', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(application)
+        body: JSON.stringify(application),
+        credentials: 'include'
       });
       const newApp = await response.json();
       applications.push(newApp);
@@ -154,7 +158,8 @@ async function deleteApplication(id) {
   if (confirm('Are you sure you want to delete this application?')) {
     try {
       await fetch(`https://job-tracker-backend-4t5v.onrender.com/api/applications/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        credentials: 'include'
       });
 
       applications = applications.filter(app => app.id !== id);
@@ -196,7 +201,10 @@ function updateStats() {
 
 async function logout() {
   try {
-    await fetch('https://job-tracker-backend-4t5v.onrender.com/api/logout', { method: 'POST' });
+    await fetch('https://job-tracker-backend-4t5v.onrender.com/api/logout', {
+      method: 'POST',
+      credentials: 'include'
+    });
     window.location.href = 'login.html';
   } catch (err) {
     console.error('Logout error:', err);

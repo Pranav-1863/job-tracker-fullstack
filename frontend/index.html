@@ -9,7 +9,9 @@
     <script>
       (async function() {
         try {
-          const response = await fetch('https://job-tracker-backend-4t5v.onrender.com/api/check-auth');
+          const response = await fetch('https://job-tracker-backend-4t5v.onrender.com/api/check-auth', {
+            credentials: 'include'
+          });
           const data = await response.json();
 
           if (!data.authenticated) {
