@@ -11,7 +11,7 @@ loadApplications();
 
 async function loadApplications() {
   try {
-    const response = await fetch('https://job-tracker-backend-4t5v.onrender.com/api/applications', {
+    const response = await fetch('/api/applications', {
       credentials: 'include'
     });
     const data = await response.json();
@@ -41,7 +41,7 @@ form.addEventListener('submit', async function(e) {
   if (editingIndex !== null) {
     const app = applications[editingIndex];
     try {
-      const response = await fetch(`https://job-tracker-backend-4t5v.onrender.com/api/applications/${app.id}`, {
+      const response = await fetch(`/api/applications/${app.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(application),
@@ -57,7 +57,7 @@ form.addEventListener('submit', async function(e) {
     }
   } else {
     try {
-      const response = await fetch('https://job-tracker-backend-4t5v.onrender.com/api/applications', {
+      const response = await fetch('/api/applications', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(application),
@@ -157,7 +157,7 @@ function editApplication(id) {
 async function deleteApplication(id) {
   if (confirm('Are you sure you want to delete this application?')) {
     try {
-      await fetch(`https://job-tracker-backend-4t5v.onrender.com/api/applications/${id}`, {
+      await fetch(`/api/applications/${id}`, {
         method: 'DELETE',
         credentials: 'include'
       });
@@ -201,7 +201,7 @@ function updateStats() {
 
 async function logout() {
   try {
-    await fetch('https://job-tracker-backend-4t5v.onrender.com/api/logout', {
+    await fetch('/api/logout', {
       method: 'POST',
       credentials: 'include'
     });
