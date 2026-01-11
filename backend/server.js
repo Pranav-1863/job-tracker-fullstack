@@ -160,6 +160,21 @@ app.put('/api/applications/:id', requireAuth, async (req, res) => {
   }
 });
 
+// TEST ENDPOINT - Add this before app.listen
+app.get('/api/test-session', (req, res) => {
+  if (!req.session.views) {
+    req.session.views = 1;
+  } else {
+    req.session.views++;
+  }
+  res.json({ 
+    message: 'Session test', 
+    views: req.session.views,
+    sessionID: req.sessionID,
+    cookie: req.session.cookie
+  });
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
