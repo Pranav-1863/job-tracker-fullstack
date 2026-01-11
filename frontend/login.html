@@ -99,34 +99,33 @@
 <body>
   <div class="auth-container">
     <h1>🔐 Login</h1>
-    <form id="loginForm">
-      <div class="form-group">
-        <label>Username</label>
-        <input type="text" id="username" required>
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="password" required>
-      </div>
-      <button type="submit">Login</button>
-      <div class="error" id="error"></div>
-    </form>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="username">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="password">
+    </div>
+    <button onclick="handleLogin()">Login</button>
+    <div class="error" id="error"></div>
     <div class="switch-link">
       Don't have an account? <a href="signup.html">Sign up</a>
     </div>
   </div>
 
   <script>
-    const form = document.getElementById('loginForm');
-    const errorDiv = document.getElementById('error');
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+    async function handleLogin() {
+      const errorDiv = document.getElementById('error');
       errorDiv.textContent = '';
-      console.log('Form submitted!');
-
+      
       const username = document.getElementById('username').value;
       const password = document.getElementById('password').value;
+
+      if (!username || !password) {
+        errorDiv.textContent = 'Please enter username and password';
+        return;
+      }
 
       try {
         const response = await fetch('/api/login', {
@@ -137,18 +136,22 @@
         });
 
         const data = await response.json();
-        console.log('Response:', data);
 
         if (response.ok) {
-          console.log('Redirecting to index.html');
-          window.location.href = 'index.html';
+          window.location.href = '/';
         } else {
-          console.log('Login failed:', data.error);
           errorDiv.textContent = data.error || 'Login failed';
         }
       } catch (err) {
-        console.log('Network error:', err);
         errorDiv.textContent = 'Network error';
+        console.error(err);
+      }
+    }
+
+    // Allow Enter key to submit
+    document.getElementById('password').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        handleLogin();
       }
     });
   </script>
