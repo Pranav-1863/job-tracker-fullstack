@@ -7,19 +7,26 @@
   </head>
   <body>
     <script>
-      (async function() {
-        try {
-          const response = await fetch('/api/check-auth', {
-            credentials: 'include'
-          });
-          const data = await response.json();
+      (function() {
+        const token = localStorage.getItem('token');
 
-          if (!data.authenticated) {
+        if (!token) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        fetch('/api/applications', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }).then(response => {
+          if (!response.ok) {
+            localStorage.removeItem('token');
             window.location.href = 'login.html';
           }
-        } catch (err) {
+        }).catch(() => {
           window.location.href = 'login.html';
-        }
+        });
       })();
     </script>
 

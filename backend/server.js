@@ -2,7 +2,8 @@ const express = require('express');
 const pool = require('./db');
 const path = require('path');
 const bcrypt = require('bcrypt');
-const session = require('express-session');
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = 'your-super-secret-jwt-key-change-in-production';
 const cors = require('cors');
 const app = express();
 
@@ -14,22 +15,19 @@ app.use(cors({
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-app.use(session({
-  secret: 'your-secret-key-change-this-later',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: true,
-    sameSite: 'none',
-    httpOnly: true
-  }
-}));
-
 function requireAuth(req, res, next) {
-  if (req.session.userId) {
+  const token = req.headers.authorization?.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Not authenticated' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.userId = decoded.userId;
     next();
-  } else {
-    res.status(401).json({ error: 'Not authenticated' });
+  } catch (err) {
+    return res.status(401).json({ error: 'Invalid token' });
   }
 }
 
@@ -44,7 +42,15 @@ app.post('/api/signup', async (req, res) => {
       [username, email, hashedPassword]
     );
 
-    res.json({ message: 'User created successfully', user: result.rows[0] });
+    const user = result.rows[0];
+
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
+
+    res.json({
+      message: 'User created successfully',
+      token: token,
+      user: user
+    });
   } catch (err) {
     console.error(err);
     if (err.code === '23505') {
@@ -76,25 +82,16 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    req.session.userId = user.id;
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET, {expiresIn: '7d'});
 
-    res.json({ message: 'Logged in successfully', user: { id: user.id, username: user.username, email: user.email } });
+    res.json({
+      message: 'Logged in successfully',
+      token: token,
+      user: { id: user.id, username: user.username, email: user.email } 
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
-  }
-});
-
-app.post('/api/logout', (req, res) => {
-  req.session.destroy();
-  res.json({ message: 'Logged out successfully' });
-});
-
-app.get('/api/check-auth', (req, res) => {
-  if (req.session.userId) {
-    res.json({ authenticated: true, userId: req.session.userId });
-  } else {
-    res.json({ authenticated: false });
   }
 });
 
@@ -102,7 +99,7 @@ app.get('/api/applications', requireAuth, async (req, res) => {
   try {
     const result = await pool.query(
       'SELECT * FROM applications WHERE user_id = $1 ORDER BY date DESC',
-      [req.session.userId]
+      [req.userId]
     );
     res.json(result.rows); 
   } catch (err) {
@@ -117,7 +114,7 @@ app.post('/api/applications', requireAuth, async (req, res) => {
 
     const result = await pool.query(
       'INSERT INTO applications (user_id, company, position, date, status) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [req.session.userId, company, position, date, status]
+      [req.userId, company, position, date, status]
     );
 
     res.json(result.rows[0]);
@@ -133,7 +130,7 @@ app.delete('/api/applications/:id', requireAuth, async (req, res) => {
 
     await pool.query(
       'DELETE FROM applications WHERE id = $1 AND user_id = $2',
-      [id, req.session.userId]
+      [id, req.userId]
     );
 
     res.json({ message: 'Application deleted' });
@@ -150,7 +147,7 @@ app.put('/api/applications/:id', requireAuth, async (req, res) => {
 
     const result = await pool.query(
       'UPDATE applications SET company = $1, position = $2, date = $3, status = $4 WHERE id = $5 AND user_id = $6 RETURNING *',
-      [company, position, date, status, id, req.session.userId]
+      [company, position, date, status, id, req.userId]
     );
 
     res.json(result.rows[0]);
@@ -158,21 +155,6 @@ app.put('/api/applications/:id', requireAuth, async (req, res) => {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
   }
-});
-
-// TEST ENDPOINT - Add this before app.listen
-app.get('/api/test-session', (req, res) => {
-  if (!req.session.views) {
-    req.session.views = 1;
-  } else {
-    req.session.views++;
-  }
-  res.json({ 
-    message: 'Session test', 
-    views: req.session.views,
-    sessionID: req.sessionID,
-    cookie: req.session.cookie
-  });
 });
 
 const PORT = process.env.PORT || 3000;

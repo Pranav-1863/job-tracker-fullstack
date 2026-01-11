@@ -152,10 +152,11 @@
           const data = await response.json();
 
           if (response.ok) {
-            successDiv.textContent = 'Account created! Redirecting to login...';
+            localStorage.setItem('token', data.token);
+            successDiv.textContent = 'Account created! Redirecting...';
             setTimeout(() => {
-              window.location.href = 'login.html';
-            }, 2000);
+              window.location.href = '/';
+            }, 1000);
           } else {
             errorDiv.textContent = data.error || 'Signup failed';
           }

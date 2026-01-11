@@ -131,13 +131,13 @@
         const response = await fetch('/api/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password }),
-          credentials: 'include'
+          body: JSON.stringify({ username, password })
         });
 
         const data = await response.json();
 
         if (response.ok) {
+          localStorage.setItem('token', data.token);
           window.location.href = '/';
         } else {
           errorDiv.textContent = data.error || 'Login failed';

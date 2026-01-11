@@ -9,10 +9,18 @@ const cancelBtn = document.getElementById("cancelBtn");
 
 loadApplications();
 
+function getAuthHeaders() {
+  const token = localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  };
+}
+
 async function loadApplications() {
   try {
     const response = await fetch('/api/applications', {
-      credentials: 'include'
+      headers: getAuthHeaders()
     });
     const data = await response.json();
     applications = data;
@@ -43,9 +51,8 @@ form.addEventListener('submit', async function(e) {
     try {
       const response = await fetch(`/api/applications/${app.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(application),
-        credentials: 'include'
+        headers: getAuthHeaders(),
+        body: JSON.stringify(application)
       });
       const updatedApp = await response.json();
       applications[editingIndex] = updatedApp;
@@ -59,9 +66,8 @@ form.addEventListener('submit', async function(e) {
     try {
       const response = await fetch('/api/applications', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(application),
-        credentials: 'include'
+        headers: getAuthHeaders(),
+        body: JSON.stringify(application)
       });
       const newApp = await response.json();
       applications.push(newApp);
@@ -159,7 +165,7 @@ async function deleteApplication(id) {
     try {
       await fetch(`/api/applications/${id}`, {
         method: 'DELETE',
-        credentials: 'include'
+        headers: getAuthHeaders()
       });
 
       applications = applications.filter(app => app.id !== id);
@@ -200,13 +206,6 @@ function updateStats() {
 }
 
 async function logout() {
-  try {
-    await fetch('/api/logout', {
-      method: 'POST',
-      credentials: 'include'
-    });
-    window.location.href = 'login.html';
-  } catch (err) {
-    console.error('Logout error:', err);
-  }
+  localStorage.removeItem('token');
+  window.location.href = 'login.html';
 }
