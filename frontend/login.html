@@ -123,6 +123,7 @@
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       errorDiv.textContent = '';
+      console.log('Form submitted!');
 
       const username = document.getElementById('username').value;
       const password = document.getElementById('password').value;
@@ -136,13 +137,17 @@
         });
 
         const data = await response.json();
+        console.log('Response:', data);
 
         if (response.ok) {
+          console.log('Redirecting to index.html');
           window.location.href = 'index.html';
         } else {
+          console.log('Login failed:', data.error);
           errorDiv.textContent = data.error || 'Login failed';
         }
       } catch (err) {
+        console.log('Network error:', err);
         errorDiv.textContent = 'Network error';
       }
     });
